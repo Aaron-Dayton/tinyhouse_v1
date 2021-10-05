@@ -3,8 +3,6 @@ import { ApolloServer } from 'apollo-server-express';
 import { connectDatabase } from './database';
 import { typeDefs, resolvers } from "./graphql/index";
 
-const port = 9000;
-
 const mount = async (app: Application) => {
   const db = await connectDatabase();
   // Setup the apollo server with our schema.
@@ -20,10 +18,10 @@ const mount = async (app: Application) => {
     server.applyMiddleware({ app, path: "/api" });
   });
 
-  app.listen(9000);
-  console.log(`[app]: http://localhost:${port}`);
+  app.listen(process.env.PORT);
+  console.log(`[app]: http://localhost:${process.env.PORT}`);
 
-  const listings = await db.listings.find({}).toArray();
+  const listings = await db.listings.find({}).toArray()
   console.log(listings)
 };
 
