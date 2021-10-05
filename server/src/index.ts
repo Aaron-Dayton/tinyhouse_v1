@@ -1,28 +1,30 @@
-import express from 'express';
-import { listings } from "./listings"
+import express, { Application } from 'express';
+import { ApolloServer } from 'apollo-server-express';
+import { connectDatabase } from './database';
+import { typeDefs, resolvers } from "./graphql/index";
 
-const app = express();
 const port = 9000;
 
-app.use(express.json());
+const mount = async (app: Application) => {
+  const db = await connectDatabase();
+  // Setup the apollo server with our schema.
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: () => ({ db })
+  });
 
-// listings
-app.get("/listings", (_req, res) => {
-  return res.send(listings);
-});
+  // Prepare the server to handle incoming requests by starting it.
+  // We need to do this since we are using middleware.
+  server.start().then(() => {
+    server.applyMiddleware({ app, path: "/api" });
+  });
 
-// delete-listings
-app.post("/delete-listing", (req, res) => {
-  const id: string = req.body.id;
-  for (let i = 0; i < listings.length; i++) {
-    if (listings[i].id === id) {
-      return res.send(listings.splice(i, 1))
-    }
-  }
+  app.listen(9000);
+  console.log(`[app]: http://localhost:${port}`);
 
-  return res.send("failed to delete listing")
-});
+  const listings = await db.listings.find({}).toArray();
+  console.log(listings)
+};
 
-app.listen(9000);
-
-console.log(`[app]: http://localhost:${port}`);
+mount(express());
