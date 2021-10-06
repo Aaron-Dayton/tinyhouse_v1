@@ -7,9 +7,9 @@ export const typeDefs = gql`
     image: String!,
     address: String!,
     price: Int!,
-    numberOfGuests: Int!,
-    numberOfBeds: Int!,
-    numberOfBaths: Int!,
+    numOfGuests: Int!,
+    numOfBeds: Int!,
+    numOfBaths: Int!,
     rating: Int!
   }
 
